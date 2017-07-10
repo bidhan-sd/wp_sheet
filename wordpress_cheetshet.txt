@@ -1,0 +1,125 @@
+<?php
+//cmb framework include here.
+include_once 'inc/cmb2-custom-field.php';
+
+//essential element for any theme.
+
+function office_master_theme_support(){
+    add_theme_support('title-tag');
+    add_theme_support('post-thumbnails');
+    add_image_size('slide-img','1500','500',true);
+    add_image_size('sidebar-slide-img','265','192',true);
+    add_image_size('team-member','100','80',true);
+    add_image_size('post-thumb','850','490',true);
+    register_nav_menus(array(
+        'primary_menu' => 'Primary Menu',
+    ));
+}
+add_action('after_setup_theme', 'office_master_theme_support');
+<!------------------------------------!>
+
+//Fallback menu
+function office_master_fallback_menu(){
+    ?>
+        <ul class="nav navbar-nav pull-right">
+            <li class="active"><a href="index.html">Home</a></li>
+            <li><a href="about.html">About</a></li>
+            <li><a href="blog.html">Blog</a></li>
+            <li><a href="team.html">Team</a></li>
+            <li><a href="contact.html"><span>Contact</span></a></li>
+        </ul> 
+    <?php
+}
+
+//Display Menu by useing code.
+<?php
+	wp_nav_menu(array(
+		'theme_location'  => 'primary_menu',
+		'fallback_cb'     => 'office_master_fallback_menu',
+		'container'       => 'div',
+		'container_class' => 'collapse navbar-collapse navbar-responsive-collapse',
+		'container_id'    => 'navbar-spy',
+		'menu_class'      => 'nav navbar-nav pull-right',
+	));   
+?>
+
+
+<!------------------------------------!>
+//Dynamic css and js.
+function office_master_css_js(){
+    //css dynamic
+    wp_enqueue_style('google-font-1','//fonts.googleapis.com/css?family=Open+Sans:400,300',null,'v1.0','all');  wp_enqueue_style('theme-style',get_template_directory_uri().'/assets/css/style.css',null,'v1.0','all');   
+	wp_enqueue_style('common-style',get_stylesheet_uri());
+    
+    //js dynamic
+    wp_enqueue_script('jquery');
+    wp_enqueue_script('wow',get_template_directory_uri().'/js/wow.min.js','jquery',null,true);
+}
+add_action('wp_enqueue_scripts','office_master_css_js');
+<!------------------------------------!>
+
+//Js Activation code dynamic here.
+function footer_extra_script(){
+?>
+    <script>
+      new WOW().init();
+    </script>
+<?php
+}
+add_action('wp_footer','footer_extra_script',30);
+<!------------------------------------!>
+
+
+//Custom post register.
+
+function office_master_custom_post(){
+    register_post_type('slider',array(
+       'labels' => array(
+            'name' => 'Main Slider',
+            'menu_name' => 'Slider Menu',
+            'all_items' => 'All Sliders',
+            'add_new' => 'Add New Slide',
+            'add_new_item' => 'Add new slide item'
+       ),
+        'public' => true,
+        'supports' =>array(
+            'title','thumbnail','revisions','custom-fields','page-attributes'
+        )
+    ));
+}
+add_action('init','office_master_custom_post');
+
+<?php
+	$offic_slider = null;
+	$offic_slider = new WP_Query(array(
+		'post_type' => 'slider',
+		'posts_per_page' => -1,//-1 means unlimited item
+	));            
+	if($offic_slider->have_posts()){
+		$i = 0;
+		while($offic_slider->have_posts()){
+			$i++;
+			$offic_slider->the_post();
+			$slider_caption = get_post_meta(get_the_ID(),'_officemaster_slider_caption',true);
+			?>
+			
+			<!-- Begin single slide -->
+			<div class="item <?php if($i == 1) { echo 'active'; } ?>">
+				<?php the_post_thumbnail('sidebar-slide-img'); ?>
+			</div>
+			<!-- End  single slide  -->                      
+			<?php
+		}
+	}else{
+		echo "No Post";   
+	}
+	wp_reset_postdata();//Must use for end wp_query process.
+?> 
+
+  <!-- Indicators -->                         
+	<ol class="carousel-indicators">
+		<?php for($x=0; $x<$i; $x++){ ?>
+			<li data-target="#carousel-example-generic" data-slide-to="<?php echo $x; ?>" class="<?php if($x == 0) { echo 'active'; } ?>"></li>
+		<?php } ?>
+	</ol>
+
