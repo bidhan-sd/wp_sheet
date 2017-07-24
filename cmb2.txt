@@ -1,3 +1,9 @@
 <?php
 //cmb framework include functions.php
-include_once 'inc/cmb2-custom-field.php';
+//include_once 'inc/cmb2-custom-field.php';
+
+//Redux framework
+/*
+functions.php page ar modhe.
+require_once('inc/redux/redux-framework.php');
+require_once('inc/office-master-theme-options.php'); // custom fields ar jonno.
